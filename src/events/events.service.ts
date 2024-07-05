@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Event } from './schemas/event.schema';
 import { CreateEventDto } from './dto/create-event.dto';
 import { RsvpDto } from './dto/rsvp.dto';
+import { UpdateEventDto } from './dto/update-event.dto';
 
 @Injectable()
 export class EventsService {
@@ -13,14 +14,23 @@ export class EventsService {
     return this.eventModel.find().exec();
   }
 
+  async findOne(id: string): Promise<Event> {
+    return this.eventModel.findOne({id: id}).exec();
+  }
+
   async create(createEventDto: CreateEventDto): Promise<Event> {
-    const createdEvent = new this.eventModel(createEventDto);
+    const createdEvent = new this.eventModel({
+      title: createEventDto.title,
+      description: createEventDto.description,
+      date: createEventDto.date,
+      organizer: createEventDto.organizer,
+    });
     return createdEvent.save();
   }
 
-  async update(id: string, updateEventDto: CreateEventDto): Promise<Event> {
-    const existingEvent = await this.eventModel.findByIdAndUpdate(
-      id,
+  async update(id: string, updateEventDto: UpdateEventDto): Promise<Event> {
+    const existingEvent = await this.eventModel.findOneAndUpdate(
+      { id: id },
       updateEventDto,
       { new: true },
     );
@@ -32,7 +42,7 @@ export class EventsService {
   }
 
   async delete(id: string): Promise<void> {
-    const result = await this.eventModel.findByIdAndDelete(id);
+    const result = await this.eventModel.deleteOne({id: id}).exec();
 
     if (!result) {
       throw new NotFoundException('Event not found');
@@ -40,11 +50,11 @@ export class EventsService {
   }
 
   async rsvp(id: string, rsvpDto: RsvpDto): Promise<Event> {
-    const event = await this.eventModel.findById(id);
+    const event = await this.eventModel.findOne({id: id}).exec();
     if (!event) {
       throw new NotFoundException('Event not found');
     }
-    event.rsvps.push(rsvpDto.email);
+    event.attendees.push(rsvpDto.user);
     return event.save();
   }
 }

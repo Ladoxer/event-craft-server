@@ -14,10 +14,13 @@ export class Event extends Document {
   description: string;
 
   @Prop({required: true})
-  date: Date;
+  date: string;
+
+  @Prop({required: true})
+  organizer: string;
 
   @Prop([String])
-  rsvps: string[];
+  attendees: string[];
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);

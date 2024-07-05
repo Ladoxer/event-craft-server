@@ -3,6 +3,7 @@ import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { RsvpDto } from './dto/rsvp.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { UpdateEventDto } from './dto/update-event.dto';
 
 @Controller('events')
 export class EventsController {
@@ -19,9 +20,14 @@ export class EventsController {
     return this.eventsService.create(createEventDto);
   }
 
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.eventsService.findOne(id);
+  }
+
   @Put(':id')
   @UseGuards(AuthGuard())
-  async update(@Param('id') id: string, @Body() updateEventDto: CreateEventDto) {
+  async update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
     return this.eventsService.update(id, updateEventDto);
   }
 
