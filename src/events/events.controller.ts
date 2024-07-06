@@ -1,17 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { RsvpDto } from './dto/rsvp.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { FilterEventDto } from './dto/filter-event.dto';
 
 @Controller('events')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Get()
-  async findAll() {
-    return this.eventsService.findAll();
+  async findAll(@Query() filterEventDto: FilterEventDto) {
+    return this.eventsService.findAll(filterEventDto);
   }
 
   @Post()

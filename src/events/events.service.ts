@@ -5,13 +5,24 @@ import { Event } from './schemas/event.schema';
 import { CreateEventDto } from './dto/create-event.dto';
 import { RsvpDto } from './dto/rsvp.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { FilterEventDto } from './dto/filter-event.dto';
 
 @Injectable()
 export class EventsService {
   constructor(@InjectModel(Event.name) private eventModel: Model<Event>) {}
 
-  async findAll(): Promise<Event[]> {
-    return this.eventModel.find().exec();
+  async findAll(filterEventDto: FilterEventDto): Promise<Event[]> {
+    const {keyword, date} = filterEventDto;
+    const filter: any = {};
+    if (keyword) {
+      filter.title = { $regex: keyword, $options: 'i' };
+    }
+
+    if (date) {
+      filter.date = date;
+    }
+
+    return this.eventModel.find(filter).exec();
   }
 
   async findOne(id: string): Promise<Event> {
